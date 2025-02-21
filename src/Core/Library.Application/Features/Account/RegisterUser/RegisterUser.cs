@@ -19,7 +19,7 @@ namespace Library.Application.Features.Account.RegisterUser
             }
             else
             {
-                return Result.Failure(ErrorStatus.INVALID_INPUT, errors);
+                return Result.Failure(ErrorStatus.BAD_REQUEST, errors);
             }
 
         }

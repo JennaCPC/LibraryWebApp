@@ -6,8 +6,9 @@ using Library.Application.Models;
 namespace Library.Application.Interfaces
 {
     public interface IIdentityService
-    {        
+    {
         Task<Result> RegisterAsync(RegisterUserDto registerDTO);
-        Task<(Result, ClaimsPrincipal?)> LoginAsync(LoginUserDto loginDto); 
+        Task<(Result, ClaimsPrincipal?)> LoginAsync(LoginUserDto loginDto);
+        Task<Result> ConfirmEmailAsync(string email, string token);
     }
 }

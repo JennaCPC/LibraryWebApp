@@ -26,7 +26,7 @@ namespace Library.Application.Features.Account.LoginUser
             }
             else
             {
-                return (Result.Failure(ErrorStatus.INVALID_INPUT, errors), default);
+                return (Result.Failure(ErrorStatus.BAD_REQUEST, errors), default);
             }
 
         }

@@ -5,7 +5,7 @@ namespace Library.Application.Models
     {
         NONE,
         NOT_FOUND = 404,
-        INVALID_INPUT = 400,
+        BAD_REQUEST = 400,
         INTERNAL_ERROR = 500,
         UNAUTHORIZED = 401
     }

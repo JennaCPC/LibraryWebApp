@@ -11,7 +11,8 @@ namespace Library.Infrastructure.Extensions
         {
             services.AddIdentityCore<UserModel>()
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<AppIdentityDbContext>();
+                .AddEntityFrameworkStores<AppIdentityDbContext>()
+                .AddTokenProvider<DataProtectorTokenProvider<UserModel>>(TokenOptions.DefaultProvider);
             services.ConfigureIdentityOptions();
             return services;
         }
