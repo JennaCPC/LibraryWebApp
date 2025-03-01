@@ -10,5 +10,6 @@ namespace Library.Application.Interfaces
         Task<Result> RegisterAsync(RegisterUserDto registerDTO);
         Task<(Result, ClaimsPrincipal?)> LoginAsync(LoginUserDto loginDto);
         Task<Result> ConfirmEmailAsync(string email, string token);
+        Task<Result> ResendConfirmationEmailAsync(string email, string clientUri); 
     }
 }

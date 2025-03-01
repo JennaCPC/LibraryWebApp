@@ -13,8 +13,6 @@ namespace Library.Server.Controllers
         {
             var members = await sender.Send(new GetMembersQuery()); 
             return Results.Ok(members);
-        }
-
-        
+        }        
     }
 }

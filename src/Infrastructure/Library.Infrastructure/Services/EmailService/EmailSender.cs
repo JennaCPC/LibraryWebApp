@@ -19,7 +19,7 @@ namespace Library.Infrastructure.Services.EmailService
             emailMessage.From.Add(new MailboxAddress("", emailConfig.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = string.Format("<h2>{0}</h2>", message.Body) };
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = string.Format("<a href={0} target='_blank'>Confirm Email</a>", message.Body) };
             return emailMessage;
         }
 

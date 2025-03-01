@@ -8,10 +8,9 @@ using Library.Application.Models;
 using Library.Domain.Constants;
 using Library.Infrastructure.Models;
 using Library.Infrastructure.Services.EmailService;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Library.Infrastructure.Services
 {
@@ -26,93 +25,17 @@ namespace Library.Infrastructure.Services
             this.emailSender = emailSender;
         }
 
-        public async Task<Result> RegisterAsync(RegisterUserDto registerDto)
-        {
-            UserModel user = new()
-            {
-                FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName,
-                Email = registerDto.Email,
-                UserName = registerDto.Email
-            };
-
-            var result = await userManager.CreateAsync(user, registerDto.Password);
-            if (result.Succeeded)
-            {                
-                var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-                var param = new Dictionary<string, string?>
-                {                   
-                    {"email", user.Email },
-                    {"token", token }
-                }; 
-                var callback = QueryHelpers.AddQueryString(registerDto.ClientUri, param);
-                var message = new EmailMessage([user.Email], "Confirm Email",  HtmlEncoder.Default.Encode(callback) ); 
-                await emailSender.SendEmailAsync(message);
-                await userManager.AddToRoleAsync(user, "Member");
-                return Result.Success(); 
-            }
-            else
-            {
-                return ProcessIdentityErrors(result.Errors);
-            }
-        }
-
-        public Result ProcessIdentityErrors(IEnumerable<IdentityError> identityErrors)
-        {
-            List<Error> errors = []; 
-
-            if (identityErrors.Where(e => e.Code == "InvalidEmail").Any())
-            {
-                errors.Add(new Error("email", "Please enter a valid email"));
-            }
-            else if (identityErrors.Where(e => e.Code == "DuplicateEmail" || e.Code == "DuplicateUserName").Any())
-            {
-                errors.Add(new Error("email", "Email is already registered"));
-            }
-
-            if (identityErrors.Where(e => e.Code.Contains("Password")).Any()) { errors.Add(new Error("password", "Password is not complex enough")); };
-
-            if (errors.Count != 0)
-            {
-                return Result.Failure(ErrorStatus.BAD_REQUEST, errors);
-            }
-            else
-            {
-                foreach (var error in identityErrors)
-                {
-                    errors.Add(new Error(error.Code, error.Description));
-                }
-                return Result.Failure(ErrorStatus.INTERNAL_ERROR, errors);
-
-            }
-        }
-
-        public async Task<Result> ConfirmEmailAsync(string email, string token)
-        {
-            token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token)); 
-
-            var user = await userManager.FindByEmailAsync(email);
-
-            if (user is null) return Result.Failure(ErrorStatus.BAD_REQUEST, [new Error("email", "Invalid Email Confirmation Request")]); 
-
-            var confirmResult = await userManager.ConfirmEmailAsync(user, token);
-            if (!confirmResult.Succeeded) return Result.Failure(ErrorStatus.BAD_REQUEST, [new Error("email", "Invalid Email Confirmation Request")]);
-
-            return Result.Success(); 
-        }
-
         public async Task<(Result, ClaimsPrincipal?)> LoginAsync(LoginUserDto loginDto)
         {
-            List<Error> errors = [];
-
             var user = await userManager.FindByEmailAsync(loginDto.Email);
-            if (user == null)
-            {
-                errors.Add(new Error("email", "Email cannot be found"));
-                return (Result.Failure(ErrorStatus.NOT_FOUND, errors), default);
-            }
-            else if (await userManager.CheckPasswordAsync(user, loginDto.Password))
+
+            if (user == null) 
+                return (Result.Failure(ResultErrorCode.NOT_FOUND, [ErrorGenerator.EmailInputError("Email cannot be found")]), default);   
+            
+            if (!user.EmailConfirmed) 
+                return (Result.Failure(ResultErrorCode.UNAUTHORIZED, [ErrorGenerator.GeneralError("Email address hasn't been confirmed yet")]), default); 
+            
+            if (await userManager.CheckPasswordAsync(user, loginDto.Password))
             {
                 var claims = new List<Claim> {
                         new(ClaimTypes.Email, user.Email.ToString()),
@@ -128,14 +51,124 @@ namespace Library.Infrastructure.Services
                 var identity = new ClaimsIdentity(claims, Cookies.CookieAuth);
                 ClaimsPrincipal claimsPrincipal = new(identity);
 
-                return (Result.Success(), claimsPrincipal);                 
+                return (Result.Success(), claimsPrincipal);
             }
             else
             {
-                errors.Add(new Error("password", "Password is incorrect"));
-                return (Result.Failure(ErrorStatus.UNAUTHORIZED, errors), default);
+                return (Result.Failure(ResultErrorCode.UNAUTHORIZED, [ErrorGenerator.PasswordInputError("Password is incorrect")]), default);
             }
         }
+        public async Task<Result> RegisterAsync(RegisterUserDto registerDto)
+        {            
+            UserModel user = new()
+            {
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName,
+                Email = registerDto.Email,
+                UserName = registerDto.Email
+            };
+            var result = await userManager.CreateAsync(user, registerDto.Password);
+            if (result.Succeeded)
+            {
+                await SendConfirmationEmailAsync(user, registerDto.ClientUri);
+                await userManager.AddToRoleAsync(user, "Member");
+                return Result.Success();
+            }
+            else
+            {
+                return ProcessRegisterIdentityErrors(result.Errors);
+            }
+            
+        }
+
+        public static Result ProcessRegisterIdentityErrors(IEnumerable<IdentityError> identityErrors)
+        {
+            List<IError> errors = [];
+
+            if (identityErrors.Where(e => e.Code == "InvalidEmail").Any())
+            {
+                errors.Add(ErrorGenerator.EmailInputError("Please enter a valid email"));
+            }
+            else if (identityErrors.Where(e => e.Code == "DuplicateEmail" || e.Code == "DuplicateUserName").Any())
+            {
+                errors.Add(ErrorGenerator.EmailInputError("Email is already registered"));
+            }
+
+            if (identityErrors.Where(e => e.Code.Contains("Password")).Any()) { errors.Add(ErrorGenerator.PasswordInputError("Password is not complex enough")); };
+
+            if (errors.Count != 0)
+            {
+                return Result.Failure(ResultErrorCode.BAD_REQUEST, errors);
+            }
+            else
+            {
+                foreach (var error in identityErrors)
+                {
+                    errors.Add(ErrorGenerator.GeneralError(error.Description));
+                }
+                return Result.Failure(ResultErrorCode.INTERNAL_ERROR, errors);
+
+            }
+        }
+
+        public async Task SendConfirmationEmailAsync(UserModel user, string clientUri)
+        {
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var param = new Dictionary<string, string?>
+                {
+                    {"email", user.Email },
+                    {"token", token }
+                };
+            var callback = QueryHelpers.AddQueryString(clientUri, param);
+            var message = new EmailMessage([user.Email], "Confirm Email", HtmlEncoder.Default.Encode(callback));
+            await emailSender.SendEmailAsync(message);
+        }
+
+        public async Task<Result> ResendConfirmationEmailAsync(string email, string clientUri)
+        {
+            var (isConfirmed, user) = await IsConfirmedUser(email); 
+            if (user != null)
+            {
+                if (isConfirmed)
+                {
+                    return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.GeneralError("Email has already been confirmed. ")]);                     
+                }
+                else
+                {
+                    await userManager.UpdateSecurityStampAsync(user);
+                    await SendConfirmationEmailAsync(user, clientUri);
+                    return Result.Success();
+                }                
+            }
+            return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.GeneralError("Account not found")]);
+        }
+
+        public async Task<(bool, UserModel?)> IsConfirmedUser(string email)         
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            return (user != null) ?  (user.EmailConfirmed, user) : (false, null); 
+        }
+
+        public async Task<Result> ConfirmEmailAsync(string email, string token)
+        {
+            token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token)); 
+
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user is null) return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.TokenError("Invalid Email Confirmation Request")]);
+
+            if (user.EmailConfirmed) return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.TokenError("Email has already been confirmed")]); 
+
+            var confirmResult = await userManager.ConfirmEmailAsync(user, token);
+            if (!confirmResult.Succeeded)
+            {  
+                return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.TokenError("Invalid token")]);
+            }
+            return Result.Success();
+
+        }
+      
 
     }
 }

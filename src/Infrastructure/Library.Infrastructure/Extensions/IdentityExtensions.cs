@@ -1,5 +1,6 @@
 ﻿using Library.Infrastructure.Data;
 using Library.Infrastructure.Models;
+using Library.Infrastructure.Services.EmailService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +13,8 @@ namespace Library.Infrastructure.Extensions
             services.AddIdentityCore<UserModel>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<AppIdentityDbContext>()
-                .AddTokenProvider<DataProtectorTokenProvider<UserModel>>(TokenOptions.DefaultProvider);
+                .AddDefaultTokenProviders()
+                .AddTokenProvider<EmailConfirmationTokenProvider<UserModel>>("emailconfirmation");
             services.ConfigureIdentityOptions();
             return services;
         }
@@ -25,7 +27,12 @@ namespace Library.Infrastructure.Extensions
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
             });
+            
+            services.Configure<EmailConfirmationTokenProviderOptions>(options =>
+                options.TokenLifespan = TimeSpan.FromDays(1));
 
             return services;
         }

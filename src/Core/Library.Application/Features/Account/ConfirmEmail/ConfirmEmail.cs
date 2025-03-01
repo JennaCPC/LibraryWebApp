@@ -4,14 +4,13 @@ using MediatR;
 
 namespace Library.Application.Features.Account.ConfirmEmail
 {
-    public record ConfirmEmailQuery(string email, string token) : IRequest<Result>;
+    public record ConfirmEmailQuery(string Email, string Token) : IRequest<Result>;
 
     public class ConfirmEmailQueryHandler(IIdentityService identityService) : IRequestHandler<ConfirmEmailQuery, Result>
     {
         public async Task<Result> Handle(ConfirmEmailQuery request, CancellationToken cancellationToken)
         {
-           return await identityService.ConfirmEmailAsync(request.email, request.token);
-            
+           return await identityService.ConfirmEmailAsync(request.Email, request.Token);            
         }
     }
 }
