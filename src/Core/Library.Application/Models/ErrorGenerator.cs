@@ -19,10 +19,9 @@ namespace Library.Application.Models
         public static IError GeneralError(string msg) { return new Error("root", msg); }
         public static IError EmailInputError(string msg) { return new Error("email", msg); }
         public static IError PasswordInputError(string msg) { return new Error("password", msg); }
+        public static IError ConfirmPasswordInputError(string msg) { return new Error("confirmPassword", msg); }
         public static IError FirstNameInputError(string msg) { return new Error("firstName", msg); }
         public static IError LastNameInputError(string msg) { return new Error("lastName", msg); }
-        public static IError TokenError(string msg) { return new Error("token", msg); }
-
     }
    
 }

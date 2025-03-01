@@ -1,4 +1,4 @@
-﻿namespace Library.Application.Features.Account.ConfirmEmail
+﻿namespace Library.Application.Features.Account.Commands.ConfirmEmail
 {
     public record ResendConfirmEmailDto
     (

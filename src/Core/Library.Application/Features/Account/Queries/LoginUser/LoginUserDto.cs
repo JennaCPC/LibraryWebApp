@@ -1,4 +1,4 @@
-﻿namespace Library.Application.Features.Account.LoginUser
+﻿namespace Library.Application.Features.Account.Queries.LoginUser
 {
     public record LoginUserDto
     (

@@ -33,6 +33,8 @@ namespace Library.Infrastructure.Extensions
             
             services.Configure<EmailConfirmationTokenProviderOptions>(options =>
                 options.TokenLifespan = TimeSpan.FromDays(1));
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+                options.TokenLifespan = TimeSpan.FromDays(1)); 
 
             return services;
         }

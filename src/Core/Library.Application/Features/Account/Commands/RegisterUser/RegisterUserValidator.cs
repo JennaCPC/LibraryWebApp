@@ -1,6 +1,6 @@
 ﻿using Library.Application.Models;
 
-namespace Library.Application.Features.Account.RegisterUser
+namespace Library.Application.Features.Account.Commands.RegisterUser
 {
     public static class RegisterUserValidator
     {

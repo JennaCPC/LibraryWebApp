@@ -3,6 +3,7 @@ using Library.Infrastructure.Data;
 using Library.Infrastructure.Extensions;
 using Library.Infrastructure.Services;
 using Library.Infrastructure.Services.EmailService;
+using Library.Infrastructure.Services.IdentityService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

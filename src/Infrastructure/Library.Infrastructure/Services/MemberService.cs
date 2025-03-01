@@ -1,11 +1,9 @@
 ﻿
-using Library.Application.Features.Account.RegisterUser;
 using Library.Application.Features.Member;
 using Library.Application.Interfaces;
 using Library.Application.Models;
 using Library.Domain.Constants;
 using Library.Infrastructure.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 
 namespace Library.Infrastructure.Services

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Library.Application.Models;
+﻿using Library.Application.Models;
 
-namespace Library.Application.Features.Account.LoginUser
+namespace Library.Application.Features.Account.Queries.LoginUser
 {
     public static class LoginUserValidator
     {
@@ -19,6 +14,6 @@ namespace Library.Application.Features.Account.LoginUser
             return errors;
         }
     }
-    
+
 
 }

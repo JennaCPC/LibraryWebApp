@@ -1,12 +1,13 @@
-﻿using Library.Application.Features.Account.LoginUser;
-using Library.Domain.Constants;
+﻿using Library.Domain.Constants;
 using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Library.Application.Features.Account.ConfirmEmail;
-using Library.Application.Features.Account.RegisterUser;
+using Library.Application.Features.Account.Commands.RegisterUser;
+using Library.Application.Features.Account.Queries.LoginUser;
+using Library.Application.Features.Account.Commands.ConfirmEmail;
+using Library.Application.Features.Account.Commands.ForgotPassword;
+using Library.Application.Features.Account.Commands.ResetPassword;
 
 namespace Library.Server.Controllers
 {
@@ -73,7 +74,7 @@ namespace Library.Server.Controllers
         [HttpGet("confirm")]
         public async Task<IResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
         {
-            var result = await sender.Send(new ConfirmEmailQuery(email, token));
+            var result = await sender.Send(new ConfirmEmailCommand(email, token));
             if (result.IsSuccess) return Results.Ok(new { message = "Email confirmed" });
             else return Results.Problem(statusCode: (int)result.Code, extensions: new Dictionary<string, object?> { { "errors", result.Errors } });
         }
@@ -81,13 +82,30 @@ namespace Library.Server.Controllers
         [HttpPost("confirm/resend")]
         public async Task<IResult> ResendConfirmation([FromBody] ResendConfirmEmailDto data)
         {
-            var result = await sender.Send(new ResendConfirmEmailQuery(data.Email, data.ClientUri));
+            var result = await sender.Send(new ResendConfirmEmailCommand(data));
             if (result.IsSuccess) return Results.Ok(new { message = "New confirmation email sent." });
             else return Results.Problem(statusCode: (int)result.Code, extensions: new Dictionary<string, object?> { { "errors", result.Errors } });
         }
         #endregion Confirm Controller
 
+        #region ForgotPassword Implementation
+        [HttpPost("forgotpassword")]
+        public async Task<IResult> ForgotPassword([FromBody] ForgotPasswordDto data)
+        {
+            var result = await sender.Send(new ForgotPasswordCommand(data));
+            if (result.IsSuccess) return Results.Ok(new { message = "A reset password email has been sent to your inbox." });
+            else return Results.Problem(statusCode: (int)result.Code, extensions: new Dictionary<string, object?> { { "errors", result.Errors } });
+        }
 
+        [HttpPost("resetpassword")]
+        public async Task<IResult> ResetPassword([FromBody] ResetPasswordDto data)
+        {
+            var result = await sender.Send(new ResetPasswordCommand(data));
+            if (result.IsSuccess) return Results.Ok(new { message = "Password has been resetted." });
+            else return Results.Problem(statusCode: (int)result.Code, extensions: new Dictionary<string, object?> { { "errors", result.Errors } });
+
+        }
+        #endregion
 
     }
 }
