@@ -8,7 +8,7 @@ using Library.Application.Features.Account.Commands.ResetPassword;
 
 namespace Library.Application.Interfaces
 {
-    public interface IIdentityService
+    public interface IAccountService
     {
         Task<Result> RegisterAsync(RegisterUserDto registerDTO);
         Task<(Result, ClaimsPrincipal?)> LoginAsync(LoginUserDto loginDto);

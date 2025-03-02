@@ -2,9 +2,9 @@
 using Library.Application.Features.Account.Commands.ResetPassword;
 using Library.Application.Models;
 
-namespace Library.Infrastructure.Services.IdentityService
+namespace Library.Infrastructure.Services.AccountService
 {
-    public partial class IdentityService
+    public partial class AccountService
     {        
         public async Task<Result> ForgotPassword(ForgotPasswordDto data)
         {

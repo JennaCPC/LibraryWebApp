@@ -3,16 +3,16 @@ using Library.Application.Features.Account.Queries.LoginUser;
 using Library.Application.Models;
 using Library.Domain.Constants;
 
-namespace Library.Infrastructure.Services.IdentityService
+namespace Library.Infrastructure.Services.AccountService
 {
-    public partial class IdentityService
+    public partial class AccountService
     {
         public async Task<(Result, ClaimsPrincipal?)> LoginAsync(LoginUserDto loginDto)
         {
             var user = await userManager.FindByEmailAsync(loginDto.Email);
 
-            if (user == null)
-                return (Result.Failure(ResultErrorCode.NOT_FOUND, [ErrorGenerator.EmailInputError("Email cannot be found")]), default);
+            if (user == null || !user.Active)
+                return (Result.Failure(ResultErrorCode.NOT_FOUND, [ErrorGenerator.EmailInputError("Account cannot be found")]), default);
 
             if (!user.EmailConfirmed)
                 return (Result.Failure(ResultErrorCode.UNAUTHORIZED, [ErrorGenerator.GeneralError("Email address hasn't been confirmed yet")]), default);

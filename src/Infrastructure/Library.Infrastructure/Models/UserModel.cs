@@ -12,5 +12,7 @@ namespace Library.Infrastructure.Models
         [PersonalData]
         [Column(TypeName = "nvarchar(100)")]
         public string LastName { get; set; } = string.Empty;
+
+        public bool Active { get; set; } = true; 
     }
 }

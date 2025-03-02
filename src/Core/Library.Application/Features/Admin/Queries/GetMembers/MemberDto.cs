@@ -1,4 +1,4 @@
-﻿namespace Library.Application.Features.Member
+﻿namespace Library.Application.Features.Admin.Queries.GetMembers
 {
     public record MemberDto
     (

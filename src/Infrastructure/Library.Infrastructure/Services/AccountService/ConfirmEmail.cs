@@ -2,9 +2,9 @@
 using Library.Application.Models;
 using Library.Infrastructure.Models;
 
-namespace Library.Infrastructure.Services.IdentityService
+namespace Library.Infrastructure.Services.AccountService
 {
-    public partial class IdentityService
+    public partial class AccountService
     {
         public async Task<Result> ConfirmEmailAsync(string email, string token)
         {

@@ -3,9 +3,9 @@ using Library.Application.Models;
 using Library.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Library.Infrastructure.Services.IdentityService
+namespace Library.Infrastructure.Services.AccountService
 {
-    public partial class IdentityService
+    public partial class AccountService
     {
         public async Task<Result> RegisterAsync(RegisterUserDto registerDto)
         {

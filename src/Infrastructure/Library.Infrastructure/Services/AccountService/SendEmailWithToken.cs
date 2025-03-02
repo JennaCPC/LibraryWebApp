@@ -2,9 +2,9 @@
 using Library.Infrastructure.Services.EmailService;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Library.Infrastructure.Services.IdentityService
+namespace Library.Infrastructure.Services.AccountService
 {
-    public partial class IdentityService
+    public partial class AccountService
     {
         public async Task SendEmailWithTokenAsync(string email, string token, string clientUri, string subject)
         {
