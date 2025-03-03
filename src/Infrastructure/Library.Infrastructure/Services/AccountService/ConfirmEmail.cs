@@ -1,6 +1,6 @@
 ﻿using Library.Application.Features.Account.Commands.ConfirmEmail;
-using Library.Application.Models;
 using Library.Infrastructure.Models;
+using Library.Shared.Utilities;
 
 namespace Library.Infrastructure.Services.AccountService
 {

@@ -21,10 +21,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Library.Application\Library.Application.csproj" />
+    <ProjectReference Include="..\..\Core\Library.Shared\Library.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
 

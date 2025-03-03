@@ -1,6 +1,6 @@
 ﻿using Library.Application.Features.Account.Commands.RegisterUser;
 using Library.Application.Interfaces;
-using Library.Application.Models;
+using Library.Shared.Utilities;
 using MediatR;
 
 namespace Library.Application.Features.Account.Commands.ResetPassword

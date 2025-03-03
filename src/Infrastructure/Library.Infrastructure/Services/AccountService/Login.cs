@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Library.Application.Features.Account.Queries.LoginUser;
-using Library.Application.Models;
 using Library.Domain.Constants;
+using Library.Shared.Utilities;
 
 namespace Library.Infrastructure.Services.AccountService
 {

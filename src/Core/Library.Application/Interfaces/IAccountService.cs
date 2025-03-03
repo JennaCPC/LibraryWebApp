@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
-using Library.Application.Models;
 using Library.Application.Features.Account.Commands.RegisterUser;
 using Library.Application.Features.Account.Queries.LoginUser;
 using Library.Application.Features.Account.Commands.ConfirmEmail;
 using Library.Application.Features.Account.Commands.ForgotPassword;
 using Library.Application.Features.Account.Commands.ResetPassword;
+using Library.Shared.Utilities;
 
 namespace Library.Application.Interfaces
 {

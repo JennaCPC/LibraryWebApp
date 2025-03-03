@@ -1,5 +1,4 @@
-﻿
-namespace Library.Application.Models
+﻿namespace Library.Shared.Utilities
 {
     public enum ResultErrorCode
     {

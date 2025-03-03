@@ -1,4 +1,4 @@
-﻿using Library.Application.Models;
+﻿using Library.Shared.Utilities;
 
 namespace Library.Application.Features.Account.Queries.LoginUser
 {

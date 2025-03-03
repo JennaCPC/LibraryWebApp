@@ -14,12 +14,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Library.Domain\Library.Domain.csproj" />
+    <ProjectReference Include="..\Library.Shared\Library.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Features\Book\" />
     <Folder Include="Features\Member\" />
     <Folder Include="Features\Search\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

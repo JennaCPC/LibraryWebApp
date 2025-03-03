@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using Library.Application.Interfaces;
-using Library.Application.Models;
+using Library.Shared.Utilities;
 using MediatR;
 
 namespace Library.Application.Features.Account.Queries.LoginUser

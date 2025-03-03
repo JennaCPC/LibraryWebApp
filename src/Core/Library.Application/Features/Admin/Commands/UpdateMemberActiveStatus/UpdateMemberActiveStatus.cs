@@ -1,6 +1,6 @@
 ﻿using Library.Application.Features.Admin.Queries.GetMembers;
 using Library.Application.Interfaces;
-using Library.Application.Models;
+using Library.Shared.Utilities;
 using MediatR;
 
 namespace Library.Application.Features.Admin.Commands.UpdateMemberActiveStatus

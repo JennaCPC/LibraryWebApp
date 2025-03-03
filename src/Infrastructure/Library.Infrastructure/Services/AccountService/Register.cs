@@ -1,7 +1,7 @@
 ﻿using Library.Application.Features.Account.Commands.RegisterUser;
-using Library.Application.Models;
 using Library.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
+using Library.Shared.Utilities;
 
 namespace Library.Infrastructure.Services.AccountService
 {

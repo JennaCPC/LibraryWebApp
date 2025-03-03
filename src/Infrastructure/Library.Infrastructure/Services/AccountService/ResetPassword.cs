@@ -1,6 +1,6 @@
 ﻿using Library.Application.Features.Account.Commands.ForgotPassword;
 using Library.Application.Features.Account.Commands.ResetPassword;
-using Library.Application.Models;
+using Library.Shared.Utilities;
 
 namespace Library.Infrastructure.Services.AccountService
 {

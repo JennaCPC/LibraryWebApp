@@ -1,6 +1,4 @@
-﻿
-
-namespace Library.Application.Models
+﻿namespace Library.Shared.Utilities
 {
 
     public interface IError
@@ -8,7 +6,7 @@ namespace Library.Application.Models
         string Type { get; }
         string Msg { get; }
     }
-    
+
     public static class ErrorGenerator
     {
         class Error(string type, string msg) : IError
@@ -23,5 +21,5 @@ namespace Library.Application.Models
         public static IError FirstNameInputError(string msg) { return new Error("firstName", msg); }
         public static IError LastNameInputError(string msg) { return new Error("lastName", msg); }
     }
-   
+
 }

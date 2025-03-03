@@ -1,10 +1,11 @@
 ﻿using Library.Application.Features.Admin.Queries.GetMembers;
 using Library.Application.Interfaces;
-using Library.Application.Models;
 using Library.Domain.Constants;
 using Library.Infrastructure.Models;
 using Library.Infrastructure.Services.EmailService;
 using Microsoft.AspNetCore.Identity;
+using Library.Shared.Utilities;
+using Library.Shared.Pagination;
 
 namespace Library.Infrastructure.Services
 {
@@ -19,20 +20,28 @@ namespace Library.Infrastructure.Services
             this.emailSender = emailSender;
         }
                 
-        public async Task<IEnumerable<MemberDto>> GetMembersAsync()
+        public async Task<(IEnumerable<MemberDto> members, MetaData? metaData)> GetMembersAsync(MembersPaginationParameters membersPaginationParams)
         {
-            var members = await userManager.GetUsersInRoleAsync(Roles.Member);
+            var totalMembers = await userManager.GetUsersInRoleAsync(Roles.Member);            
 
             List<MemberDto> memberDtos = [];
 
-            if (members != null)
+            if (totalMembers != null)
             {
-                foreach (var member in members)
+                var count = totalMembers.Count;
+                foreach (var member in totalMembers)
                 {
                     memberDtos.Add(ToMemberDto(member)); 
                 }
+                var members = memberDtos.Skip((membersPaginationParams.PageNumber - 1) * membersPaginationParams.PageSize)
+                                    .Take(membersPaginationParams.PageSize);
+
+                var pagedMembersList = PagedList<MemberDto>.ToPagedList(members, count, membersPaginationParams.PageNumber, membersPaginationParams.PageSize); 
+
+                return (pagedMembersList, pagedMembersList.MetaData); 
             }
-            return memberDtos;
+            
+            return ([], null);
         }             
 
         public async Task<Result> UpdateMemberActiveStatusAsync(string email)
