@@ -6,7 +6,7 @@ namespace Library.Application.Interfaces
 {
     public interface IAdminService
     {
-        Task<(IEnumerable<MemberDto> members, MetaData metaData)> GetMembersAsync(MembersPaginationParameters membersPaginationParams);
+        Task<(IEnumerable<MemberDto> members, MetaData? metaData)> GetMembersAsync(MembersPaginationParameters membersPaginationParams);
 
         Task<Result> UpdateMemberActiveStatusAsync(string email); 
     }

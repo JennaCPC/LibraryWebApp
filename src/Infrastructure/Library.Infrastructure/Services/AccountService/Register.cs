@@ -14,7 +14,8 @@ namespace Library.Infrastructure.Services.AccountService
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
-                UserName = registerDto.Email
+                UserName = registerDto.Email, 
+                StartDate = DateTime.UtcNow
             };
             var result = await userManager.CreateAsync(user, registerDto.Password);
             if (result.Succeeded)

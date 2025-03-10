@@ -14,5 +14,9 @@ namespace Library.Infrastructure.Models
         public string LastName { get; set; } = string.Empty;
 
         public bool Active { get; set; } = true; 
+
+        public DateTime StartDate { get; set; } = DateTime.Today;
+
+        public DateTime? EndDate { get; set; }
     }
 }
