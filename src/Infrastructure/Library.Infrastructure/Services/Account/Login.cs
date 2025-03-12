@@ -1,9 +1,9 @@
-﻿using System.Security.Claims;
-using Library.Application.Features.Account.Queries.LoginUser;
+﻿using Library.Application.Features.Account.Queries.LoginUser;
 using Library.Domain.Constants;
 using Library.Shared.Utilities;
+using System.Security.Claims;
 
-namespace Library.Infrastructure.Services.AccountService
+namespace Library.Infrastructure.Services.Account
 {
     public partial class AccountService
     {

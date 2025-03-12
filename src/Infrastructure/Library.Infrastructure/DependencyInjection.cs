@@ -2,8 +2,8 @@
 using Library.Infrastructure.Data;
 using Library.Infrastructure.Extensions;
 using Library.Infrastructure.Services;
+using Library.Infrastructure.Services.Account;
 using Library.Infrastructure.Services.EmailService;
-using Library.Infrastructure.Services.AccountService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +22,9 @@ namespace Library.Infrastructure
             services.AddScoped<AppIdentityDbInitialiser>();             
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAdminService, AdminService>();
-            services.AddScoped<EmailSender>(); 
+            services.AddScoped<IMemberService, MemberService>();
+            services.AddScoped<EmailSender>();
+            services.AddScoped<IdentityErrorService>(); 
             return services;
         }
     }

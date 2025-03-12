@@ -1,5 +1,7 @@
 ﻿using Library.Application;
+using Library.Application.Interfaces;
 using Library.Infrastructure;
+using Library.Server.Common;
 
 namespace Library.Server
 {
@@ -8,7 +10,8 @@ namespace Library.Server
         public static IServiceCollection AddServerDI(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddApplicationDI() 
-                .AddInfrastructureDI(configuration); 
+                .AddInfrastructureDI(configuration);
+            services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>(); 
             return services;
         }
     }

@@ -2,7 +2,7 @@
 using Library.Infrastructure.Models;
 using Library.Shared.Utilities;
 
-namespace Library.Infrastructure.Services.AccountService
+namespace Library.Infrastructure.Services.Account
 {
     public partial class AccountService
     {
@@ -14,7 +14,7 @@ namespace Library.Infrastructure.Services.AccountService
 
             if (user.EmailConfirmed) return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.GeneralError("Email has already been confirmed")]);
 
-            var confirmResult = await userManager.ConfirmEmailAsync(user, DecodeToken(token));
+            var confirmResult = await userManager.ConfirmEmailAsync(user, TokenCodec.DecodeToken(token));
             if (!confirmResult.Succeeded)
             {
                 return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.GeneralError("Invalid token")]);
@@ -22,13 +22,7 @@ namespace Library.Infrastructure.Services.AccountService
             return Result.Success();
 
         }
-
-        public async Task SendConfirmationEmailAsync(UserModel user, string clientUri)
-        {
-            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            await SendEmailWithTokenAsync(user.Email!, clientUri, EncodeToken(token), "Confirm Email");
-        }
-
+        
         public async Task<Result> ResendConfirmationEmailAsync(ResendConfirmEmailDto data)
         {
             var (isConfirmed, user) = await IsConfirmedUser(data.Email);
@@ -41,18 +35,17 @@ namespace Library.Infrastructure.Services.AccountService
                 else
                 {
                     await userManager.UpdateSecurityStampAsync(user);
-                    await SendConfirmationEmailAsync(user, data.ClientUri);
+                    await SendEmailConfirmationAsync(user, data.ClientUri);
                     return Result.Success();
                 }
             }
             return Result.Failure(ResultErrorCode.BAD_REQUEST, [ErrorGenerator.GeneralError("Account not found")]);
         }
-
+       
         public async Task<(bool, UserModel?)> IsConfirmedUser(string email)
         {
             var user = await userManager.FindByEmailAsync(email);
             return user != null ? (user.EmailConfirmed, user) : (false, null);
-        }        
-
+        }
     }
 }

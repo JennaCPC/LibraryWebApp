@@ -97,20 +97,11 @@ namespace Library.Infrastructure.Services
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                     return Result.Success(); 
-                return Result.Failure(ResultErrorCode.INTERNAL_ERROR, ProcessIdentityErrors(result.Errors));
+                return Result.Failure(ResultErrorCode.INTERNAL_ERROR, IdentityErrorService.GetGeneralErrors(result.Errors));
             }
             return Result.Failure(ResultErrorCode.NOT_FOUND, [ErrorGenerator.GeneralError("Member not found")]); 
-        }
-        
-        public static List<IError> ProcessIdentityErrors(IEnumerable<IdentityError> identityErrors)
-        {
-            List<IError> errors = []; 
-            foreach (var error in identityErrors)
-            {
-                errors.Add(ErrorGenerator.GeneralError(error.Description)); 
-            }
-            return errors;
-        }      
+        }    
+             
 
         private static MemberDto ToMemberDto(UserModel user)
         {            

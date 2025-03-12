@@ -1,18 +1,25 @@
 ﻿using Library.Application.Features.Account.Commands.ForgotPassword;
 using Library.Application.Features.Account.Commands.ResetPassword;
+using Library.Infrastructure.Services.EmailService;
 using Library.Shared.Utilities;
 
-namespace Library.Infrastructure.Services.AccountService
+namespace Library.Infrastructure.Services.Account
 {
     public partial class AccountService
-    {        
+    {
         public async Task<Result> ForgotPassword(ForgotPasswordDto data)
         {
             var user = await userManager.FindByEmailAsync(data.Email);
             if (user == null)
                 return Result.Failure(ResultErrorCode.NOT_FOUND, [ErrorGenerator.GeneralError("Account not found")]);
+
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            await SendEmailWithTokenAsync(data.Email, EncodeToken(token), data.ClientUri, "Reset Password");
+            var callbackUrl = GetCallbackUrl(user.Email, token, data.ClientUri);
+
+            var message = new EmailMessage([user.Email], "Reset Password", templateProvider.PasswordReset(callbackUrl));
+
+            await emailSender.SendEmailAsync(message);
+
             return Result.Success();
         }
 
@@ -21,24 +28,20 @@ namespace Library.Infrastructure.Services.AccountService
             var user = await userManager.FindByEmailAsync(data.Email);
             if (user == null)
                 return Result.Failure(ResultErrorCode.NOT_FOUND, [ErrorGenerator.GeneralError("Account not found")]);
-            
-            var result = await userManager.ResetPasswordAsync(user, DecodeToken(data.Token), data.Password);
+
+            var result = await userManager.ResetPasswordAsync(user, TokenCodec.DecodeToken(data.Token), data.Password);
             if (!result.Succeeded)
             {
-                var identityErrors = result.Errors;
-                if (identityErrors.Where(e => e.Code.Contains("Password")).Any())
+                var err = IdentityErrorService.GetPasswordErrorMsg(result.Errors);
+
+                var errors = err.Type switch
                 {
-                    return Result.Failure(ResultErrorCode.INTERNAL_ERROR, [ErrorGenerator.PasswordInputError("Password is not complex enough")]);
-                }
-                else
-                {
-                    List<IError> errors = [];
-                    foreach (var error in identityErrors)
-                    {
-                        errors.Add(ErrorGenerator.GeneralError(error.Description));
-                    }
-                    return Result.Failure(ResultErrorCode.INTERNAL_ERROR, errors);
-                }
+                    IdentityErrorType.Wrong_Password => [ErrorGenerator.PasswordInputError(err.Msg)],
+                    IdentityErrorType.Invalid_Password => [ErrorGenerator.GeneralError(err.Msg)],
+                    _ => IdentityErrorService.GetGeneralErrors(result.Errors)
+                };
+              
+                return Result.Failure(ResultErrorCode.INTERNAL_ERROR, errors);            
             }
             return Result.Success();
         }
